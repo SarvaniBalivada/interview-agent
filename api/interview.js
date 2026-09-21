@@ -18,8 +18,11 @@ export default async function handler(req, res) {
   } catch (e) {
     reqBody = {};
   }
-  const { prompt } = reqBody;
-  if (!prompt || typeof prompt !== "string") {
+  if (typeof reqBody === "string") {
+    try { reqBody = JSON.parse(reqBody); } catch (e) { reqBody = {}; }
+  }
+  const { prompt } = reqBody || {};
+  if (typeof prompt !== "string") {
     res.status(400).json({ error: "Missing 'prompt' in request body" });
     return;
   }
