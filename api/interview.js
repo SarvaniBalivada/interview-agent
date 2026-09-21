@@ -8,7 +8,17 @@ export default async function handler(req, res) {
     return;
   }
 
-  const { prompt } = req.body || {};
+  let reqBody;
+  try {
+    if (req.json && typeof req.json === "function") {
+      reqBody = await req.json();
+    } else {
+      reqBody = req.body || {};
+    }
+  } catch (e) {
+    reqBody = {};
+  }
+  const { prompt } = reqBody;
   if (!prompt || typeof prompt !== "string") {
     res.status(400).json({ error: "Missing 'prompt' in request body" });
     return;

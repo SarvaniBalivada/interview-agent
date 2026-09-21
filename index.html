@@ -416,6 +416,7 @@ async function loadNextQuestion(){
     }
   }catch(e){
     genResult = null;
+    toast("Generation failed: " + (e.message || "Unknown error"));
   }
 
   if(genResult){
