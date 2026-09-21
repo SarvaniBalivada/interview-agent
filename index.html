@@ -1015,7 +1015,12 @@ function renderCodePanel(){
 function renderFeed(){
   const el = document.getElementById("panelFeed");
   if(!el) return;
-  const s = state.session, c = s.current;
+  const s = state.session;
+  if(!s || !s.current){
+    el.innerHTML = '<h3>Interviewer</h3><div class="empty">Loading…</div>';
+    return;
+  }
+  const c = s.current;
   const feedHtml = (c.interviewerFeed||[]).map(m=>{
     if(m.isVerdict){
       return '<div class="msg"><div class="who">Interviewer</div>'+
