@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Room — DSA Mock Interview</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -10,8 +10,6 @@
 <style>
   :root{
     box-sizing:border-box;
-    padding-top:env(safe-area-inset-top,0px);
-    padding-bottom:env(safe-area-inset-bottom,0px);
 
     --ink:#14181C; --panel:#1B2026; --panel-2:#20262D; --line:#2A3038;
     --text:#E8ECEF; --muted:#8A94A0; --muted-2:#5C6672;
@@ -38,6 +36,8 @@
   *{box-sizing:border-box;}
   body{
     margin:0; height:100%; background:var(--ink); color:var(--text);
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
     font-family:var(--font-sans); font-size:15px; line-height:1.55;
     -webkit-font-smoothing:antialiased;
   }
@@ -243,8 +243,8 @@ function lsGet(key, def){
 }
 function lsSet(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){} }
 
-async function docGet(path, def){ return lsGet("room:"+path, def); }
-async function docSet(path, val){ lsSet("room:"+path, val); return true; }
+function docGet(path, def){ return lsGet("room:"+path, def); }
+function docSet(path, val){ lsSet("room:"+path, val); return true; }
 
 const PATH_BANK = "room/bank";
 const PATH_SESSIONS = "room/sessions";
@@ -761,6 +761,10 @@ function renderNav(){
 }
 
 function render(){
+  try{
+  if(state.view !== "session" && state.session && state.session.timerHandle){
+    stopTimer();
+  }
   renderNav();
   const view = document.getElementById("view");
   view.className = "view " + (state.view === "session" ? "wide" : "narrow");
@@ -768,6 +772,7 @@ function render(){
   if(state.view === "setup") return renderSetup(view);
   if(state.view === "session") return renderSession(view);
   if(state.view === "history") return renderHistory(view);
+  }catch(e){ console.error("Render error:", e); }
 }
 
 function esc(s){ const d = document.createElement("div"); d.textContent = s == null ? "" : String(s); return d.innerHTML; }

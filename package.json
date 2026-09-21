@@ -5,5 +5,9 @@
   "description": "Self-hosted DSA mock interview agent — static frontend + a small serverless proxy to the Anthropic API.",
   "engines": {
     "node": ">=18"
+  },
+  "scripts": {
+    "dev": "vercel dev",
+    "dev:netlify": "netlify dev"
   }
 }
