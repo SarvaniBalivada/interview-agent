@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Room — DSA Mock Interview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+
+    --ink:#14181C; --panel:#1B2026; --panel-2:#20262D; --line:#2A3038;
+    --text:#E8ECEF; --muted:#8A94A0; --muted-2:#5C6672;
+    --accent:#4FA8A0; --accent-dim:#3A7B75; --accent-ink:#0D1211;
+    --warn:#D9A441; --danger:#D9705A; --success:#5FAE72;
+    --font-sans:'IBM Plex Sans',-apple-system,sans-serif;
+    --font-mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  @media (prefers-color-scheme: light){
+    :root:not([data-theme="dark"]){
+      --ink:#F4F5F3; --panel:#FFFFFF; --panel-2:#F0F1EE; --line:#DADDD8;
+      --text:#181C1F; --muted:#5B6570; --muted-2:#848E98;
+      --accent:#2E7A73; --accent-dim:#1F5C56; --accent-ink:#FFFFFF;
+      --warn:#9A6B15; --danger:#A6442F; --success:#2E7A45;
+    }
+  }
+  :root[data-theme="light"]{
+    --ink:#F4F5F3; --panel:#FFFFFF; --panel-2:#F0F1EE; --line:#DADDD8;
+    --text:#181C1F; --muted:#5B6570; --muted-2:#848E98;
+    --accent:#2E7A73; --accent-dim:#1F5C56; --accent-ink:#FFFFFF;
+    --warn:#9A6B15; --danger:#A6442F; --success:#2E7A45;
+  }
+  html{scroll-padding-top:env(safe-area-inset-top,0px); height:100%;}
+  *{box-sizing:border-box;}
+  body{
+    margin:0; height:100%; background:var(--ink); color:var(--text);
+    font-family:var(--font-sans); font-size:15px; line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--accent); color:var(--accent-ink);}
+  button{font-family:inherit; cursor:pointer;}
+  textarea,input,select{font-family:inherit; color:inherit;}
+  a{color:var(--accent);}
+
+  .app{display:flex; min-height:100%; height:100%;}
+
+  /* ---------- Sidebar ---------- */
+  .rail{
+    width:220px; flex:0 0 220px; background:var(--panel); border-right:1px solid var(--line);
+    display:flex; flex-direction:column; padding:22px 14px;
+    padding-top:calc(22px + env(safe-area-inset-top,0px));
+  }
+  .rail-brand{font-family:var(--font-mono); font-size:13px; color:var(--muted); letter-spacing:.02em; padding:0 10px 22px;}
+  .rail-brand b{color:var(--text); display:block; font-size:16px; font-weight:600; margin-bottom:2px;}
+  .rail-nav{display:flex; flex-direction:column; gap:2px;}
+  .rail-btn{
+    display:flex; align-items:center; gap:10px; text-align:left; background:none; border:none;
+    color:var(--muted); padding:9px 10px; border-radius:6px; font-size:14px; font-weight:500;
+  }
+  .rail-btn .dot{width:6px; height:6px; border-radius:50%; background:var(--line); flex:0 0 auto;}
+  .rail-btn:hover{background:var(--panel-2); color:var(--text);}
+  .rail-btn.active{background:var(--panel-2); color:var(--text);}
+  .rail-btn.active .dot{background:var(--accent);}
+  .rail-foot{margin-top:auto; padding:10px; font-size:12px; color:var(--muted-2); font-family:var(--font-mono);}
+
+  /* ---------- Main ---------- */
+  .main{flex:1; min-width:0; overflow-y:auto; height:100%;}
+  .view{margin:0 auto; padding:36px 28px 80px;}
+  .view.narrow{max-width:720px;}
+  .view.wide{max-width:1280px;}
+  .view-head{margin-bottom:26px;}
+  .view-head h1{font-size:22px; font-weight:600; margin:0 0 6px;}
+  .view-head p{color:var(--muted); margin:0; font-size:14px; max-width:60ch;}
+
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:20px;}
+  .card + .card{margin-top:14px;}
+  .stack{display:flex; flex-direction:column; gap:14px;}
+  .row{display:flex; gap:10px; flex-wrap:wrap;}
+
+  label.field{display:flex; flex-direction:column; gap:6px; font-size:13px; color:var(--muted); flex:1; min-width:160px;}
+  label.field span.lbl{color:var(--text); font-weight:500;}
+  select,.txt,textarea{
+    background:var(--panel-2); border:1px solid var(--line); color:var(--text);
+    border-radius:7px; padding:9px 11px; font-size:14px; width:100%;
+  }
+  select:focus,.txt:focus,textarea:focus,button:focus-visible{outline:2px solid var(--accent); outline-offset:1px;}
+  textarea{resize:vertical; min-height:90px; font-family:var(--font-mono); font-size:13.5px; line-height:1.6;}
+
+  .btn{
+    background:var(--accent); color:var(--accent-ink); border:none; border-radius:7px;
+    padding:10px 18px; font-size:14px; font-weight:600;
+  }
+  .btn:hover{background:var(--accent-dim);}
+  .btn:disabled{opacity:.4; cursor:not-allowed;}
+  .btn.ghost{background:none; border:1px solid var(--line); color:var(--text);}
+  .btn.ghost:hover{border-color:var(--muted-2);}
+  .btn.sm{padding:6px 12px; font-size:13px;}
+  .btn.danger{background:none; border:1px solid var(--danger); color:var(--danger);}
+
+  .tag{display:inline-flex; align-items:center; gap:5px; font-family:var(--font-mono); font-size:11.5px;
+       color:var(--muted); background:var(--panel-2); border:1px solid var(--line); padding:3px 9px; border-radius:20px;}
+  .tag.accent{color:var(--accent); border-color:var(--accent-dim);}
+
+  .empty{border:1px dashed var(--line); border-radius:10px; padding:28px 20px; text-align:center; color:var(--muted); font-size:14px;}
+
+  .check-row{display:flex; align-items:center; gap:8px; font-size:13.5px; color:var(--text);}
+  .check-row input{width:16px; height:16px;}
+
+  /* bank list */
+  .qrow{display:flex; align-items:flex-start; gap:12px; padding:12px 0; border-top:1px solid var(--line);}
+  .qrow:first-child{border-top:none;}
+  .qrow .qtext{flex:1; font-size:13.5px; color:var(--text);}
+  .qrow .qmeta{display:flex; gap:6px; flex:0 0 auto; align-items:center;}
+
+  /* setup */
+  .tier-grid,.opt-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:8px;}
+  .tier-opt{border:1px solid var(--line); background:var(--panel-2); border-radius:8px; padding:10px 12px; text-align:left; color:var(--text);}
+  .tier-opt b{display:block; font-size:13.5px; font-family:var(--font-mono);}
+  .tier-opt span{display:block; font-size:12px; color:var(--muted); margin-top:2px;}
+  .tier-opt.sel{border-color:var(--accent); background:rgba(79,168,160,.08);}
+
+  /* session header bar */
+  .ibar{display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:18px; flex-wrap:wrap;}
+  .sess-tags{display:flex; gap:8px; flex-wrap:wrap;}
+  .progress{font-family:var(--font-mono); font-size:12px; color:var(--muted); margin-top:4px;}
+
+  .timer{position:relative; width:56px; height:56px; flex:0 0 auto;}
+  .timer svg{transform:rotate(-90deg); width:56px; height:56px;}
+  .timer circle{fill:none; stroke-width:4;}
+  .timer .bg{stroke:var(--line);}
+  .timer .fg{stroke:var(--accent); stroke-linecap:round; transition:stroke-dashoffset 1s linear, stroke .3s;}
+  .timer.warn .fg{stroke:var(--warn);}
+  .timer.crit .fg{stroke:var(--danger);}
+  .timer .t{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+            font-family:var(--font-mono); font-size:11.5px; color:var(--text);}
+
+  /* 3-pane interview grid */
+  .igrid{display:grid; grid-template-columns:1fr 1.3fr 1fr; gap:14px; align-items:start;}
+  @media (max-width:980px){ .igrid{grid-template-columns:1fr;} }
+  .ipanel{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:16px; display:flex; flex-direction:column;}
+  .ipanel h3{margin:0 0 12px; font-size:11.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; font-weight:600;}
+  .q-title{font-size:16px; font-weight:600; margin:0 0 10px;}
+  .q-statement{white-space:pre-wrap; font-size:14px; line-height:1.65;}
+  .ex-block{background:var(--panel-2); border:1px solid var(--line); border-radius:8px; padding:10px 12px; font-family:var(--font-mono); font-size:12px; margin-top:10px; white-space:pre-wrap;}
+
+  .code-editor{width:100%; min-height:300px; background:#0F1317; color:#D8E0E6; border:1px solid var(--line);
+               border-radius:8px; padding:12px; font-family:var(--font-mono); font-size:13px; line-height:1.6;
+               resize:vertical; tab-size:2; white-space:pre;}
+  .editor-top{display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:8px;}
+  .editor-top select{width:auto;}
+  .run-note{font-size:11.5px; color:var(--muted-2); margin-top:6px;}
+  .run-results{margin-top:12px; display:flex; flex-direction:column; gap:6px;}
+  .tc-row{display:flex; justify-content:space-between; gap:10px; font-family:var(--font-mono); font-size:11.5px; padding:7px 9px; border-radius:6px; background:var(--panel-2); border-left:3px solid var(--line);}
+  .tc-row.pass{border-left-color:var(--success);}
+  .tc-row.fail{border-left-color:var(--danger);}
+  .conf-row{display:flex; gap:8px; align-items:center; margin-top:14px; flex-wrap:wrap;}
+  .conf-row .lbl{font-size:13px; color:var(--muted); margin-right:2px;}
+  .conf-btn{width:32px; height:32px; border-radius:50%; border:1px solid var(--line); background:var(--panel-2); color:var(--muted); font-family:var(--font-mono); font-size:12.5px;}
+  .conf-btn.sel{background:var(--accent); border-color:var(--accent); color:var(--accent-ink); font-weight:700;}
+
+  .feed{display:flex; flex-direction:column; gap:10px; flex:1; overflow-y:auto; max-height:460px; padding-right:2px; margin-bottom:10px;}
+  .msg{background:var(--panel-2); border-radius:8px; padding:10px 12px; font-size:13.5px; line-height:1.55;}
+  .msg.you{border:1px solid var(--line); background:transparent;}
+  .msg .who{font-size:10.5px; color:var(--muted); margin-bottom:4px; text-transform:uppercase; letter-spacing:.04em;}
+  .msg .score{font-family:var(--font-mono); font-size:22px; font-weight:700; margin:2px 0 6px;}
+  .msg .score.strong{color:var(--success);} .msg .score.partial{color:var(--warn);} .msg .score.weak,.msg .score.incorrect{color:var(--danger);}
+  .msg ul{margin:6px 0 0; padding-left:16px;}
+  .ask-row{display:flex; gap:6px; margin-top:auto;}
+  .ask-row input{flex:1;}
+
+  .feedback{border-top:1px solid var(--line); margin-top:20px; padding-top:20px;}
+  .score-big{font-family:var(--font-mono); font-size:36px; font-weight:700; line-height:1;}
+  .score-big.strong{color:var(--success);} .score-big.partial{color:var(--warn);} .score-big.weak,.score-big.incorrect{color:var(--danger);}
+  .verdict-lbl{font-size:12px; color:var(--muted); text-transform:capitalize; margin-top:2px;}
+
+  /* summary */
+  .big-score{display:flex; align-items:baseline; gap:10px;}
+  .big-score .n{font-family:var(--font-mono); font-size:48px; font-weight:700;}
+  .topic-bar-row{display:flex; align-items:center; gap:10px; padding:7px 0; font-size:13.5px;}
+  .topic-bar-row .name{width:150px; flex:0 0 auto; color:var(--muted);}
+  .topic-bar-track{flex:1; height:6px; background:var(--panel-2); border-radius:4px; overflow:hidden;}
+  .topic-bar-fill{height:100%; background:var(--accent); border-radius:4px;}
+  .topic-bar-val{width:34px; text-align:right; font-family:var(--font-mono); color:var(--muted); font-size:12px;}
+
+  /* history */
+  .hist-row{border-top:1px solid var(--line); padding:14px 0; cursor:pointer;}
+  .hist-row:first-child{border-top:none;}
+  .hist-row-top{display:flex; justify-content:space-between; align-items:center;}
+  .hist-row-top .l{font-size:13.5px;}
+  .hist-row-top .r{font-family:var(--font-mono); font-size:16px; font-weight:600;}
+  .hist-meta{font-size:12px; color:var(--muted); margin-top:3px;}
+  .hist-detail{margin-top:12px; display:none;}
+  .hist-detail.open{display:block;}
+  .hist-q{border-top:1px solid var(--line); padding:8px 0; font-size:12.5px; display:flex; justify-content:space-between; gap:10px;}
+  .hist-q .qt{color:var(--muted); flex:1;}
+
+  .toast{position:fixed; bottom:calc(20px + env(safe-area-inset-bottom,0px)); left:50%; transform:translateX(-50%);
+         background:var(--panel-2); border:1px solid var(--line); color:var(--text); padding:10px 16px; border-radius:8px;
+         font-size:13px; z-index:50; box-shadow:0 6px 20px rgba(0,0,0,.25); max-width:90vw;}
+
+  .skel{background:linear-gradient(90deg,var(--panel-2),var(--line),var(--panel-2)); background-size:200% 100%; animation:sk 1.3s infinite; border-radius:6px;}
+  @keyframes sk{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+
+  @media (max-width:720px){
+    .app{flex-direction:column;}
+    .rail{
+      width:100%; flex:0 0 auto; flex-direction:row; align-items:center; border-right:none;
+      border-top:1px solid var(--line); order:2; padding:8px 10px;
+      padding-bottom:calc(8px + env(safe-area-inset-bottom,0px));
+      position:sticky; bottom:0;
+    }
+    .rail-brand{display:none;}
+    .rail-nav{flex-direction:row; flex:1; justify-content:space-around;}
+    .rail-btn{flex-direction:column; gap:4px; font-size:11px; padding:6px 8px;}
+    .rail-foot{display:none;}
+    .main{order:1;}
+    .view{padding:24px 16px 40px;}
+    .topic-bar-row .name{width:110px;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="rail">
+    <div class="rail-brand"><b>The Room</b>DSA mock interviews</div>
+    <div class="rail-nav" id="nav"></div>
+    <div class="rail-foot" id="railFoot">· · ·</div>
+  </nav>
+  <main class="main"><div class="view narrow" id="view"></div></main>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============ storage (plain browser localStorage — this device only) ============ */
+function lsGet(key, def){
+  try{ const raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : def; }catch(e){ return def; }
+}
+function lsSet(key, val){ try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){} }
+
+async function docGet(path, def){ return lsGet("room:"+path, def); }
+async function docSet(path, val){ lsSet("room:"+path, val); return true; }
+
+const PATH_BANK = "room/bank";
+const PATH_SESSIONS = "room/sessions";
+const PATH_STATS = "room/topicStats";
+
+/* ============ constants ============ */
+const TOPICS = [
+  "Arrays","Linked List","Greedy","Recursion & Backtracking","Binary Search",
+  "Heaps","Stack & Queue","Strings","Binary Tree","Binary Search Tree",
+  "Graph","Dynamic Programming","Trie"
+];
+const DIFFICULTIES = ["Easy","Medium","Hard","Mixed"];
+const LANGUAGES = ["JavaScript","Python","Java","C++","C"];
+
+const TIERS = [
+  { id:"3LPA",  label:"₹3–5 LPA",  sub:"Service-based", guidance:"Brute-force is acceptable if correct. Prioritize clear working logic over optimality. Phrase the question plainly with explicit constraints." },
+  { id:"6LPA",  label:"₹6–10 LPA", sub:"Mid-tier product", guidance:"Expect a correct working solution and awareness of time complexity. Brute-force first is fine but push toward an optimized approach. Constraints should hint brute-force may be too slow." },
+  { id:"12LPA", label:"₹12–18 LPA",sub:"Strong product / Tier-1", guidance:"Expect an optimal or near-optimal approach on the first pass, clear complexity analysis, and edge cases handled without prompting." },
+  { id:"20LPA", label:"₹20–28 LPA",sub:"Unicorn / high-growth", guidance:"Expect optimal solution, proactive edge-case handling, and comfort discussing trade-offs between approaches." },
+  { id:"30LPA", label:"₹30+ LPA",  sub:"FAANG / elite product", guidance:"Bar is optimal solution plus scale considerations (huge N, streaming input, memory limits), rigorous complexity discussion, and an unstated edge case the candidate must catch." }
+];
+function tierInfo(id){ return TIERS.find(t=>t.id===id) || TIERS[1]; }
+
+/* ============ app state ============ */
+const state = {
+  view: "setup",
+  bank: [],
+  sessions: [],
+  topicStats: {},
+  setup: { mode:"cumulative", topic:TOPICS[0], difficulty:"Medium", tier:"6LPA", count:5, timeBudget:900, language:"JavaScript", mixBank:false },
+  session: null,
+  historyOpen: {}
+};
+
+/* ============ AI wrapper — calls your own serverless proxy ============ */
+async function askJSON(prompt){
+  const res = await fetch("/api/interview", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt })
+  });
+  let data;
+  try{ data = await res.json(); }catch(e){ throw new Error("Server returned an invalid response."); }
+  if(!res.ok || data.error){ throw new Error(data.error || "Request failed ("+res.status+")"); }
+  return data;
+}
+
+/* ============ bank parsing (optional custom questions) ============ */
+function parseBankInputFinal(raw){
+  raw = raw.trim();
+  if(!raw) return [];
+  try{
+    const parsed = JSON.parse(raw);
+    if(Array.isArray(parsed)){
+      return parsed.map(q => ({
+        id: crypto.randomUUID(),
+        topic: (q.topic || "General").trim(),
+        difficulty: (q.difficulty || "Medium").trim(),
+        text: (q.text || q.question || "").trim(),
+        notes: (q.notes || q.solution || "").trim()
+      })).filter(q=>q.text);
+    }
+  }catch(e){}
+  return raw.split(/\n+/).map(l=>l.trim()).filter(Boolean).map(line=>{
+    const parts = line.split("|").map(p=>p.trim());
+    if(parts.length >= 3){
+      return { id: crypto.randomUUID(), topic: parts[0]||"General", difficulty: parts[1]||"Medium", text: parts.slice(2).join(" | "), notes:"" };
+    }
+    return { id: crypto.randomUUID(), topic:"General", difficulty:"Medium", text: line, notes:"" };
+  });
+}
+
+/* ============ topic weighting (for cumulative mode) ============ */
+function pickWeightedTopic(){
+  const weights = TOPICS.map(t=>{
+    const st = state.topicStats[t];
+    if(!st || !st.attempts) return 1;
+    return Math.max(0.4, (100 - st.avgScore) / 40);
+  });
+  const total = weights.reduce((a,b)=>a+b,0);
+  let r = Math.random() * total;
+  for(let i=0;i<TOPICS.length;i++){ r -= weights[i]; if(r<=0) return TOPICS[i]; }
+  return TOPICS[TOPICS.length-1];
+}
+function pickDifficultyForSetup(){
+  if(state.setup.difficulty !== "Mixed") return state.setup.difficulty;
+  const pool = ["Easy","Medium","Hard"];
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+
+/* ============ question generation ============ */
+async function generateQuestion(topic, difficulty, tier, recentTitles){
+  const t = tierInfo(tier);
+  const result = await askJSON(
+    "You are drawing from Striver's well-known SDE/A2Z DSA sheet (the popular takeuforward.org interview prep list). "+
+    "Generate ONE original problem statement, in your own words, in the spirit of a well-known problem from that sheet's '"+topic+"' section, at '"+difficulty+"' difficulty. "+
+    "Calibrate the framing and expected rigor to a candidate targeting "+t.label+" ("+t.sub+"): "+t.guidance+" "+
+    "Do not reveal the approach or solution. Avoid repeating the spirit of these already-asked titles this session: "+JSON.stringify(recentTitles||[])+". "+
+    "Return strict JSON only: {"+
+      "\"title\": string, \"topic\": string, \"difficulty\": string, "+
+      "\"statement\": string (full problem statement including constraints, use \\n for line breaks), "+
+      "\"examples\": array of up to 3 {\"input\": string, \"output\": string, \"explanation\": string}, "+
+      "\"starter_js\": string (a JavaScript starter snippet defining exactly `function solve(...) { }` with correctly named parameters matching the problem, and a short comment, nothing else), "+
+      "\"test_cases\": array of 3 to 5 {\"input\": array of JSON-serializable arguments matching solve()'s parameters in order, \"expected\": JSON-serializable expected return value} — keep inputs small and fully deterministic"+
+    "}"
+  );
+  return result;
+}
+
+async function remodelFromBank(orig, tier, recentTitles){
+  const t = tierInfo(tier);
+  const result = await askJSON(
+    "You are simulating a technical interviewer at an Indian tech company hiring bar of "+t.label+" ("+t.sub+"). "+
+    "Rewrite the following DSA problem so it tests the exact same underlying algorithm and difficulty, but changes the surface framing. "+
+    "Calibration: "+t.guidance+" Do not reveal the solution. Avoid repeating: "+JSON.stringify(recentTitles||[])+". "+
+    "Original (topic: "+orig.topic+", difficulty: "+orig.difficulty+"): "+orig.text+
+    (orig.notes ? (" Reference notes (do not reveal): "+orig.notes) : "")+
+    " Return strict JSON only: {\"title\": string, \"topic\": string, \"difficulty\": string, "+
+    "\"statement\": string (use \\n for line breaks), "+
+    "\"examples\": array of up to 3 {\"input\": string, \"output\": string, \"explanation\": string}, "+
+    "\"starter_js\": string (a `function solve(...) { }` JS starter with a short comment), "+
+    "\"test_cases\": array of 3 to 5 {\"input\": array of args, \"expected\": JSON value}}"
+  );
+  return result;
+}
+
+/* ============ session lifecycle ============ */
+async function startSession(){
+  state.session = {
+    id: crypto.randomUUID(),
+    mode: state.setup.mode,
+    topic: state.setup.mode === "topic" ? state.setup.topic : null,
+    difficultySetting: state.setup.difficulty,
+    tier: state.setup.tier,
+    language: state.setup.language,
+    timeBudget: state.setup.timeBudget,
+    count: state.setup.count,
+    startedAt: Date.now(),
+    idx: 0,
+    current: null,
+    answered: [],
+    phase: "loading-question",
+    timerRemaining: state.setup.timeBudget,
+    timerHandle: null
+  };
+  state.view = "session";
+  render();
+  await loadNextQuestion();
+}
+
+async function loadNextQuestion(){
+  const s = state.session;
+  const topic = s.mode === "topic" ? s.topic : pickWeightedTopic();
+  const difficulty = pickDifficultyForSetup();
+  s.phase = "loading-question";
+  s.current = { topic, difficulty, remodelFailed:false };
+  render();
+
+  const recent = s.answered.slice(-3).map(a=>a.title).filter(Boolean);
+  let useBank = state.setup.mixBank && state.bank.length && Math.random() < 0.4;
+  let genResult = null;
+  try{
+    if(useBank){
+      const candidates = state.bank.filter(q=>q.topic === topic);
+      const orig = candidates.length ? candidates[Math.floor(Math.random()*candidates.length)] : state.bank[Math.floor(Math.random()*state.bank.length)];
+      genResult = await remodelFromBank(orig, s.tier, recent);
+    } else {
+      genResult = await generateQuestion(topic, difficulty, s.tier, recent);
+    }
+  }catch(e){
+    genResult = null;
+  }
+
+  if(genResult){
+    s.current = {
+      title: genResult.title || (topic+" problem"),
+      topic: genResult.topic || topic,
+      difficulty: genResult.difficulty || difficulty,
+      statement: genResult.statement || "Could not load the full statement — try Next or restart the session.",
+      examples: genResult.examples || [],
+      starter_js: genResult.starter_js || "function solve() {\n  // your code here\n}",
+      test_cases: genResult.test_cases || []
+    };
+  } else {
+    s.current = {
+      title: topic+" problem (generation failed)",
+      topic, difficulty,
+      statement: "Couldn't reach the AI to generate a question. Check your connection and try Next, or restart the session.",
+      examples: [], starter_js: "function solve() {\n  \n}", test_cases: [],
+      remodelFailed: true
+    };
+  }
+  s.current.interviewerFeed = [
+    { who:"interviewer", text: s.current.remodelFailed ? "Sorry — I couldn't generate a question just now." : "Take your time. Talk me through your approach whenever you're ready — feel free to ask me anything to clarify the problem first." }
+  ];
+  s.current.runResults = null;
+  s.phase = "answering";
+  s.timerRemaining = s.timeBudget;
+  startTimer();
+  render();
+}
+
+function startTimer(){
+  const s = state.session;
+  stopTimer();
+  s.timerHandle = setInterval(()=>{
+    s.timerRemaining -= 1;
+    if(s.timerRemaining <= 0){
+      s.timerRemaining = 0;
+      stopTimer();
+      submitAnswer(true);
+      return;
+    }
+    updateTimerUI();
+  }, 1000);
+}
+function stopTimer(){
+  const s = state.session;
+  if(s && s.timerHandle){ clearInterval(s.timerHandle); s.timerHandle = null; }
+}
+function updateTimerUI(){
+  const el = document.getElementById("timerWrap");
+  if(!el || !state.session) return;
+  const s = state.session;
+  const pct = Math.max(0, s.timerRemaining / s.timeBudget);
+  const circ = 2 * Math.PI * 24;
+  const offset = circ * (1 - pct);
+  const fg = el.querySelector(".fg");
+  if(fg) fg.style.strokeDashoffset = offset;
+  el.classList.toggle("warn", pct <= 0.4 && pct > 0.15);
+  el.classList.toggle("crit", pct <= 0.15);
+  const t = el.querySelector(".t");
+  if(t) t.textContent = fmtTime(s.timerRemaining);
+}
+function fmtTime(sec){
+  sec = Math.max(0, Math.round(sec));
+  const m = Math.floor(sec/60), s2 = sec%60;
+  return m+":"+String(s2).padStart(2,"0");
+}
+
+/* ============ JS sandboxed execution (Worker + timeout) ============ */
+function runJS(code, tests){
+  return new Promise((resolve)=>{
+    const workerCode =
+      "self.onmessage = function(e){"+
+      "  var code = e.data.code, tests = e.data.tests;"+
+      "  try{"+
+      "    var factory = new Function(code + \"\\nreturn (typeof solve === 'function') ? solve : null;\");"+
+      "    var solve = factory();"+
+      "    if(!solve){ self.postMessage({error:\"No function named 'solve' was found. Define: function solve(...) { }\"}); return; }"+
+      "    var out = [];"+
+      "    for(var i=0;i<tests.length;i++){"+
+      "      var t = tests[i];"+
+      "      try{"+
+      "        var actual = solve.apply(null, t.input);"+
+      "        out.push({input:t.input, expected:t.expected, actual:actual, pass: JSON.stringify(actual)===JSON.stringify(t.expected)});"+
+      "      }catch(err){"+
+      "        out.push({input:t.input, expected:t.expected, actual:null, error:String(err && err.message || err), pass:false});"+
+      "      }"+
+      "    }"+
+      "    self.postMessage({results: out});"+
+      "  }catch(err){"+
+      "    self.postMessage({error:String(err && err.message || err)});"+
+      "  }"+
+      "};";
+    let blobUrl, worker;
+    try{
+      const blob = new Blob([workerCode], {type:"application/javascript"});
+      blobUrl = URL.createObjectURL(blob);
+      worker = new Worker(blobUrl);
+    }catch(err){
+      resolve({error:"Live execution isn't available in this environment. Use Submit for AI review instead."});
+      return;
+    }
+    const timer = setTimeout(()=>{
+      try{ worker.terminate(); }catch(e){}
+      try{ URL.revokeObjectURL(blobUrl); }catch(e){}
+      resolve({error:"Timed out after 3s — check for an infinite loop."});
+    }, 3000);
+    worker.onmessage = (e)=>{
+      clearTimeout(timer);
+      try{ worker.terminate(); }catch(err){}
+      try{ URL.revokeObjectURL(blobUrl); }catch(err){}
+      resolve(e.data);
+    };
+    worker.onerror = (e)=>{
+      clearTimeout(timer);
+      try{ worker.terminate(); }catch(err){}
+      try{ URL.revokeObjectURL(blobUrl); }catch(err){}
+      resolve({error: e.message || "Worker error"});
+    };
+    worker.postMessage({code, tests});
+  });
+}
+
+async function handleRun(){
+  const s = state.session;
+  if(!s || s.phase !== "answering") return;
+  if(s.language !== "JavaScript"){ toast("Live run is only available for JavaScript right now."); return; }
+  const code = document.getElementById("codeInput") ? document.getElementById("codeInput").value : "";
+  const btn = document.getElementById("btnRun");
+  if(btn){ btn.disabled = true; btn.textContent = "Running…"; }
+  const result = await runJS(code, s.current.test_cases || []);
+  if(btn){ btn.disabled = false; btn.textContent = "Run"; }
+  s.current.runResults = result;
+  renderRunResults();
+}
+
+function renderRunResults(){
+  const el = document.getElementById("runResultsBox");
+  if(!el) return;
+  const r = state.session.current.runResults;
+  if(!r){ el.innerHTML = ""; return; }
+  if(r.error){
+    el.innerHTML = '<div class="tc-row fail">'+esc(r.error)+'</div>';
+    return;
+  }
+  el.innerHTML = (r.results||[]).map((tc,i)=>
+    '<div class="tc-row '+(tc.pass?"pass":"fail")+'">'+
+      '<span>Test '+(i+1)+' — '+(tc.pass ? "Passed" : (tc.error ? "Error: "+esc(tc.error) : "Failed — got "+esc(JSON.stringify(tc.actual))+" expected "+esc(JSON.stringify(tc.expected))))+'</span>'+
+    '</div>'
+  ).join("");
+}
+
+async function submitAnswer(timedOut){
+  const s = state.session;
+  if(!s || s.phase !== "answering") return;
+  stopTimer();
+  const code = document.getElementById("codeInput") ? document.getElementById("codeInput").value : "";
+  const confidence = s.current.pendingConfidence || null;
+  s.current.userCode = code;
+  s.current.confidenceRating = confidence;
+  s.current.timedOut = !!timedOut;
+  s.current.timeTakenSec = s.timeBudget - s.timerRemaining;
+  s.phase = "evaluating";
+  render();
+
+  const tier = tierInfo(s.tier);
+  const runSummary = s.current.runResults && s.current.runResults.results
+    ? (s.current.runResults.results.filter(r=>r.pass).length + "/" + s.current.runResults.results.length + " sample tests passed")
+    : "not run against sample tests";
+  try{
+    const result = await askJSON(
+      "Act as a strict but fair technical interviewer at an Indian tech company hiring bar of "+tier.label+" ("+tier.sub+"). "+
+      "Evaluate the candidate's code for this DSA interview question. Judge correctness of logic and algorithmic approach, not exact syntax style. "+
+      "Consider completeness, whether complexity was addressed, and time usage (budget "+s.timeBudget+"s, took "+s.current.timeTakenSec+"s"+(timedOut?", ran out of time":"")+"). "+
+      "Question: "+s.current.statement+" "+
+      "Language: "+s.language+". Sample test result: "+runSummary+". "+
+      "Candidate's code: "+(code || "(no code submitted — timed out)")+" "+
+      "Candidate's self-rated confidence before this evaluation: "+(confidence || "not given")+"/5. "+
+      "Return strict JSON only: {\"correctness_score\": integer 0-100, \"verdict\": one of \"strong\"|\"partial\"|\"weak\"|\"incorrect\", "+
+      "\"feedback\": string (2-3 direct sentences), \"missed_points\": array of short strings, "+
+      "\"followup_question\": string (a natural interviewer follow-up probing optimization, edge cases, or scale), "+
+      "\"complexity_note\": string (short note on expected vs given time/space complexity)}"
+    );
+    s.current.correctness_score = result.correctness_score ?? 0;
+    s.current.verdict = result.verdict || "partial";
+    s.current.feedback = result.feedback || "";
+    s.current.missed_points = result.missed_points || [];
+    s.current.followup_question = result.followup_question || "";
+    s.current.complexity_note = result.complexity_note || "";
+  }catch(e){
+    s.current.correctness_score = null;
+    s.current.verdict = "partial";
+    s.current.feedback = "Scoring is unavailable right now — your answer was recorded, but no AI evaluation could be generated for this question.";
+    s.current.missed_points = [];
+    s.current.followup_question = "";
+    s.current.complexity_note = "";
+    s.current.evalFailed = true;
+  }
+  s.current.interviewerFeed.push({
+    who:"interviewer", isVerdict:true,
+    score: s.current.correctness_score, verdict: s.current.verdict, feedback: s.current.feedback,
+    missed: s.current.missed_points, complexity: s.current.complexity_note, followup: s.current.followup_question
+  });
+  s.phase = "feedback";
+  render();
+}
+
+async function askClarifying(){
+  const s = state.session;
+  const input = document.getElementById("askInput");
+  if(!input) return;
+  const text = input.value.trim();
+  if(!text) return;
+  input.value = "";
+  s.current.interviewerFeed.push({ who:"you", text });
+  renderFeed();
+  try{
+    const result = await askJSON(
+      "You are the same technical interviewer mid-question, staying in character. The candidate asks a clarifying question before answering: "+JSON.stringify(text)+". "+
+      "The problem under discussion: "+s.current.statement+" "+
+      "Reply briefly (1-2 sentences) the way a real interviewer would — clarify scope or constraints but do not reveal the solution approach. "+
+      "Return strict JSON only: {\"reply\": string}"
+    );
+    s.current.interviewerFeed.push({ who:"interviewer", text: result.reply || "Good question — use your best judgment on that." });
+  }catch(e){
+    s.current.interviewerFeed.push({ who:"interviewer", text: "(Couldn't reach the interviewer right now — go ahead with your best assumption.)" });
+  }
+  renderFeed();
+}
+
+async function nextQuestion(){
+  const s = state.session;
+  s.answered.push(s.current);
+  s.idx += 1;
+  if(s.idx >= s.count){
+    await finishSession();
+    return;
+  }
+  await loadNextQuestion();
+}
+
+async function finishSession(){
+  const s = state.session;
+  s.phase = "summarizing";
+  render();
+  const tier = tierInfo(s.tier);
+  const compact = s.answered.map(a=>({
+    topic: a.topic, difficulty: a.difficulty, correctness_score: a.correctness_score,
+    verdict: a.verdict, confidenceRating: a.confidenceRating,
+    timeTakenSec: a.timeTakenSec, timeBudgetSec: s.timeBudget, timedOut: a.timedOut
+  }));
+  let summary = null;
+  try{
+    summary = await askJSON(
+      "Summarize this mock DSA interview session like an experienced mentor reviewing a candidate's scorecard, targeting a "+tier.label+" ("+tier.sub+") hiring bar. "+
+      "Session data: "+JSON.stringify(compact)+". "+
+      "Return strict JSON only: {\"overall_score\": integer 0-100, "+
+      "\"topic_breakdown\": array of {\"topic\": string, \"avg_score\": integer, \"count\": integer}, "+
+      "\"strengths\": array of short strings, \"weak_areas\": array of short strings, "+
+      "\"suggestions\": array of 3-5 concrete actionable strings tied to the target level, "+
+      "\"confidence_calibration_note\": string comparing self-rated confidence to actual scores}"
+    );
+  }catch(e){
+    const scores = compact.map(c=>c.correctness_score).filter(n=>typeof n === "number");
+    const avg = scores.length ? Math.round(scores.reduce((a,b)=>a+b,0)/scores.length) : 0;
+    summary = { overall_score: avg, topic_breakdown: [], strengths: [], weak_areas: [], suggestions: ["Summary generation was unavailable — raw scores are shown below."], confidence_calibration_note: "" };
+  }
+
+  const record = {
+    id: s.id, mode: s.mode, topic: s.topic, tier: s.tier,
+    startedAt: s.startedAt, endedAt: Date.now(),
+    questions: s.answered.map(a=>({ title:a.title, topic:a.topic, difficulty:a.difficulty, correctness_score:a.correctness_score, statement:a.statement })),
+    summary
+  };
+  state.sessions.unshift(record);
+  await docSet(PATH_SESSIONS, { list: state.sessions });
+
+  const byTopic = {};
+  s.answered.forEach(a=>{
+    if(typeof a.correctness_score !== "number") return;
+    if(!byTopic[a.topic]) byTopic[a.topic] = [];
+    byTopic[a.topic].push(a.correctness_score);
+  });
+  Object.keys(byTopic).forEach(topic=>{
+    const scores = byTopic[topic];
+    const prev = state.topicStats[topic] || { attempts:0, avgScore:0 };
+    const attempts = prev.attempts + scores.length;
+    const avgScore = ((prev.avgScore * prev.attempts) + scores.reduce((a,b)=>a+b,0)) / attempts;
+    state.topicStats[topic] = { attempts, avgScore, lastSeenAt: Date.now() };
+  });
+  await docSet(PATH_STATS, state.topicStats);
+
+  s.phase = "done";
+  s.summary = summary;
+  render();
+}
+
+function endSessionToSetup(){
+  stopTimer();
+  state.session = null;
+  state.view = "setup";
+  render();
+}
+
+/* ============ toast ============ */
+let toastTimer = null;
+function toast(msg){
+  let el = document.getElementById("toastEl");
+  if(!el){
+    el = document.createElement("div");
+    el.id = "toastEl"; el.className = "toast";
+    document.body.appendChild(el);
+  }
+  el.textContent = msg;
+  el.style.display = "block";
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>{ el.style.display = "none"; }, 3200);
+}
+
+/* ============ rendering ============ */
+const NAV_ITEMS = [
+  { id:"setup", label:"Setup" },
+  { id:"session", label:"Session" },
+  { id:"history", label:"History" },
+  { id:"bank", label:"Bank" }
+];
+
+function renderNav(){
+  const nav = document.getElementById("nav");
+  nav.innerHTML = "";
+  NAV_ITEMS.forEach(item=>{
+    const btn = document.createElement("button");
+    btn.className = "rail-btn" + (state.view === item.id ? " active" : "");
+    btn.innerHTML = '<span class="dot"></span><span>'+item.label+'</span>';
+    btn.addEventListener("click", ()=>{
+      if(item.id === "session" && !state.session){ toast("Start a session from Setup first."); return; }
+      state.view = item.id; render();
+    });
+    nav.appendChild(btn);
+  });
+  document.getElementById("railFoot").textContent = state.bank.length + " custom question" + (state.bank.length===1?"":"s");
+}
+
+function render(){
+  renderNav();
+  const view = document.getElementById("view");
+  view.className = "view " + (state.view === "session" ? "wide" : "narrow");
+  if(state.view === "bank") return renderBank(view);
+  if(state.view === "setup") return renderSetup(view);
+  if(state.view === "session") return renderSession(view);
+  if(state.view === "history") return renderHistory(view);
+}
+
+function esc(s){ const d = document.createElement("div"); d.textContent = s == null ? "" : String(s); return d.innerHTML; }
+
+/* ---- Bank view (optional custom questions) ---- */
+function renderBank(view){
+  view.innerHTML =
+    '<div class="view-head"><h1>Custom questions</h1><p>Optional. By default, questions are generated live from Striver\'s sheet based on your Setup choices. Add your own here if you want to mix in specific problems too.</p></div>'+
+    '<div class="card stack">'+
+      '<label class="field"><span class="lbl">Add questions</span>'+
+        '<textarea id="bankInput" placeholder="Paste a JSON array of {topic, difficulty, text, notes}\n\nor one per line as:  Arrays | Easy | Find the second largest element in an array"></textarea>'+
+      '</label>'+
+      '<div class="row"><button class="btn" id="btnAddBank">Add to bank</button>'+
+      '<button class="btn ghost sm" id="btnClearBank" style="margin-left:auto;">Clear all</button></div>'+
+    '</div>'+
+    '<div class="card" id="bankListCard" style="margin-top:14px;"></div>';
+
+  document.getElementById("btnAddBank").addEventListener("click", async ()=>{
+    const raw = document.getElementById("bankInput").value;
+    const parsed = parseBankInputFinal(raw);
+    if(parsed.length === 0){ toast("Couldn't find any questions in that text."); return; }
+    state.bank = state.bank.concat(parsed);
+    await docSet(PATH_BANK, { questions: state.bank });
+    document.getElementById("bankInput").value = "";
+    toast(parsed.length + " question(s) added.");
+    renderBankList();
+  });
+  document.getElementById("btnClearBank").addEventListener("click", async ()=>{
+    if(!confirm("Remove all custom questions? This can't be undone.")) return;
+    state.bank = [];
+    await docSet(PATH_BANK, { questions: [] });
+    renderBankList();
+  });
+  renderBankList();
+}
+function renderBankList(){
+  const card = document.getElementById("bankListCard");
+  if(!card) return;
+  if(state.bank.length === 0){
+    card.innerHTML = '<div class="empty">No custom questions yet — not required. Setup generates questions automatically.</div>';
+    return;
+  }
+  card.innerHTML = state.bank.map(q=>
+    '<div class="qrow" data-id="'+q.id+'">'+
+      '<div class="qtext">'+esc(q.text)+'</div>'+
+      '<div class="qmeta"><span class="tag">'+esc(q.topic)+'</span><span class="tag">'+esc(q.difficulty)+'</span>'+
+      '<button class="btn ghost sm" data-del="'+q.id+'">Remove</button></div>'+
+    '</div>'
+  ).join("");
+  card.querySelectorAll("[data-del]").forEach(btn=>{
+    btn.addEventListener("click", async ()=>{
+      const id = btn.getAttribute("data-del");
+      state.bank = state.bank.filter(q=>q.id !== id);
+      await docSet(PATH_BANK, { questions: state.bank });
+      renderBankList();
+    });
+  });
+}
+
+/* ---- Setup view ---- */
+function renderSetup(view){
+  view.innerHTML =
+    '<div class="view-head"><h1>Set up a session</h1><p>Pick a topic and difficulty — questions are generated fresh from Striver\'s sheet each time, calibrated to the interview bar you choose.</p></div>'+
+    '<div class="card stack">'+
+      '<div class="row">'+
+        '<label class="field"><span class="lbl">Mode</span>'+
+          '<select id="modeSel">'+
+            '<option value="cumulative"'+(state.setup.mode==="cumulative"?" selected":"")+'>Cumulative (mixed, weighted to weak topics)</option>'+
+            '<option value="topic"'+(state.setup.mode==="topic"?" selected":"")+'>Topic-wise</option>'+
+          '</select>'+
+        '</label>'+
+        '<label class="field" id="topicField" style="'+(state.setup.mode==="topic"?"":"display:none;")+'"><span class="lbl">Topic</span>'+
+          '<select id="topicSel">'+TOPICS.map(t=>'<option value="'+esc(t)+'"'+(state.setup.topic===t?" selected":"")+'>'+esc(t)+'</option>').join("")+'</select>'+
+        '</label>'+
+        '<label class="field"><span class="lbl">Difficulty</span>'+
+          '<select id="diffSel">'+DIFFICULTIES.map(d=>'<option value="'+d+'"'+(state.setup.difficulty===d?" selected":"")+'>'+d+'</option>').join("")+'</select>'+
+        '</label>'+
+      '</div>'+
+      '<div>'+
+        '<span class="lbl" style="font-size:13px;color:var(--muted);display:block;margin-bottom:8px;">Target package range</span>'+
+        '<div class="tier-grid" id="tierGrid">'+
+          TIERS.map(t=>'<button class="tier-opt'+(state.setup.tier===t.id?" sel":"")+'" data-tier="'+t.id+'"><b>'+t.label+'</b><span>'+t.sub+'</span></button>').join("")+
+        '</div>'+
+      '</div>'+
+      '<div class="row">'+
+        '<label class="field"><span class="lbl">Number of questions</span>'+
+          '<select id="countSel">'+[3,5,7,10].map(n=>'<option value="'+n+'"'+(state.setup.count===n?" selected":"")+'>'+n+'</option>').join("")+'</select>'+
+        '</label>'+
+        '<label class="field"><span class="lbl">Time per question</span>'+
+          '<select id="budgetSel">'+
+            [[300,"5 min"],[600,"10 min"],[900,"15 min"],[1200,"20 min"],[1800,"30 min"],[2400,"40 min"],[3600,"1 hr"]].map(([v,l])=>'<option value="'+v+'"'+(state.setup.timeBudget===v?" selected":"")+'>'+l+'</option>').join("")+
+          '</select>'+
+        '</label>'+
+        '<label class="field"><span class="lbl">Code language</span>'+
+          '<select id="langSel">'+LANGUAGES.map(l=>'<option value="'+l+'"'+(state.setup.language===l?" selected":"")+'>'+l+(l==="JavaScript"?" (live run)":"")+'</option>').join("")+'</select>'+
+        '</label>'+
+      '</div>'+
+      (state.bank.length ? '<label class="check-row"><input type="checkbox" id="mixBankChk"'+(state.setup.mixBank?" checked":"")+'> Mix in my custom bank questions too</label>' : '')+
+      '<button class="btn" id="btnStart" style="align-self:flex-start;">Start interview</button>'+
+    '</div>';
+
+  document.getElementById("modeSel").addEventListener("change", e=>{
+    state.setup.mode = e.target.value;
+    document.getElementById("topicField").style.display = state.setup.mode === "topic" ? "" : "none";
+  });
+  const topicSel = document.getElementById("topicSel");
+  if(topicSel) topicSel.addEventListener("change", e=>{ state.setup.topic = e.target.value; });
+  document.getElementById("diffSel").addEventListener("change", e=>{ state.setup.difficulty = e.target.value; });
+  document.getElementById("countSel").addEventListener("change", e=>{ state.setup.count = parseInt(e.target.value,10); });
+  document.getElementById("budgetSel").addEventListener("change", e=>{ state.setup.timeBudget = parseInt(e.target.value,10); });
+  document.getElementById("langSel").addEventListener("change", e=>{ state.setup.language = e.target.value; });
+  const mixChk = document.getElementById("mixBankChk");
+  if(mixChk) mixChk.addEventListener("change", e=>{ state.setup.mixBank = e.target.checked; });
+  document.querySelectorAll("[data-tier]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      state.setup.tier = btn.getAttribute("data-tier");
+      document.querySelectorAll("[data-tier]").forEach(b=>b.classList.toggle("sel", b===btn));
+    });
+  });
+  document.getElementById("btnStart").addEventListener("click", ()=>{
+    startSession();
+  });
+}
+
+/* ---- Session view (3-pane) ---- */
+function renderSession(view){
+  const s = state.session;
+  if(!s){ view.innerHTML = '<div class="empty">No active session. Go to Setup to start one.</div>'; return; }
+
+  if(s.phase === "summarizing"){
+    view.innerHTML = '<div class="view-head"><h1>Wrapping up</h1><p>Generating your session analytics…</p></div><div class="card"><div class="skel" style="height:80px;"></div></div>';
+    return;
+  }
+  if(s.phase === "done"){ return renderSummary(view, s); }
+
+  const tier = tierInfo(s.tier);
+  const c = s.current;
+  view.innerHTML =
+    '<div class="ibar">'+
+      '<div>'+
+        '<div class="sess-tags">'+
+          '<span class="tag accent">'+esc(tier.label)+'</span>'+
+          (c && c.topic ? '<span class="tag">'+esc(c.topic)+'</span>' : '')+
+          (c && c.difficulty ? '<span class="tag">'+esc(c.difficulty)+'</span>' : '')+
+          '<span class="tag">'+esc(s.language)+'</span>'+
+        '</div>'+
+        '<div class="progress">Question '+(s.idx+1)+' of '+s.count+'</div>'+
+      '</div>'+
+      (s.phase === "answering" ? '<div class="timer" id="timerWrap"><svg viewBox="0 0 56 56"><circle class="bg" cx="28" cy="28" r="24"></circle><circle class="fg" cx="28" cy="28" r="24" stroke-dasharray="'+(2*Math.PI*24)+'" stroke-dashoffset="0"></circle></svg><div class="t">'+fmtTime(s.timerRemaining)+'</div></div>' : '')+
+    '</div>'+
+    '<div class="igrid">'+
+      '<div class="ipanel" id="panelQuestion"></div>'+
+      '<div class="ipanel" id="panelCode"></div>'+
+      '<div class="ipanel" id="panelFeed"></div>'+
+    '</div>';
+
+  renderQuestionPanel();
+  renderCodePanel();
+  renderFeed();
+  if(s.phase === "answering") setTimeout(updateTimerUI, 30);
+}
+
+function renderQuestionPanel(){
+  const el = document.getElementById("panelQuestion");
+  if(!el) return;
+  const s = state.session, c = s.current;
+  if(s.phase === "loading-question"){
+    el.innerHTML = '<h3>Question</h3><div class="skel" style="height:20px;width:70%;margin-bottom:10px;"></div><div class="skel" style="height:14px;margin-bottom:6px;"></div><div class="skel" style="height:14px;width:85%;"></div>';
+    return;
+  }
+  el.innerHTML =
+    '<h3>Question</h3>'+
+    '<div class="q-title">'+esc(c.title)+'</div>'+
+    '<div class="q-statement">'+esc(c.statement)+'</div>'+
+    (c.examples && c.examples.length ? c.examples.map(ex=>
+      '<div class="ex-block">Input: '+esc(ex.input)+'\nOutput: '+esc(ex.output)+(ex.explanation? '\n'+esc(ex.explanation):'')+'</div>'
+    ).join("") : "");
+}
+
+function renderCodePanel(){
+  const el = document.getElementById("panelCode");
+  if(!el) return;
+  const s = state.session, c = s.current;
+  if(s.phase === "loading-question"){
+    el.innerHTML = '<h3>Your solution</h3><div class="skel" style="height:280px;"></div>';
+    return;
+  }
+  if(s.phase === "evaluating"){
+    el.innerHTML = '<h3>Your solution</h3><div class="skel" style="height:280px;"></div><p style="color:var(--muted);font-size:13px;margin-top:10px;">Evaluating…</p>';
+    return;
+  }
+  const readOnly = s.phase === "feedback";
+  el.innerHTML =
+    '<h3>Your solution</h3>'+
+    '<textarea id="codeInput" class="code-editor" spellcheck="false"'+(readOnly?" readonly":"")+'>'+esc(s.language === "JavaScript" ? (c.userCode || c.starter_js) : (c.userCode || ""))+'</textarea>'+
+    (s.language === "JavaScript" ? '<div class="run-note">Define your function as <code>function solve(...) { }</code> — Run checks it against sample tests.</div>' : '<div class="run-note">Live run is available for JavaScript. Submit sends your code straight to the interviewer for review.</div>')+
+    '<div id="runResultsBox" class="run-results"></div>'+
+    (s.phase === "answering" ? (
+      '<div class="row" style="margin-top:12px;">'+
+        (s.language === "JavaScript" ? '<button class="btn ghost sm" id="btnRun">Run</button>' : '')+
+      '</div>'+
+      '<div class="conf-row"><span class="lbl">Confidence?</span>'+
+        [1,2,3,4,5].map(n=>'<button class="conf-btn" data-conf="'+n+'">'+n+'</button>').join("")+
+      '</div>'+
+      '<div class="row" style="margin-top:14px;"><button class="btn" id="btnSubmitAns" disabled>Submit to interviewer</button></div>'
+    ) : (
+      '<div class="row" style="margin-top:16px;"><button class="btn" id="btnNext">'+((s.idx+1 >= s.count) ? "Finish session" : "Next question")+'</button></div>'
+    ));
+
+  const codeEl = document.getElementById("codeInput");
+  if(codeEl && !readOnly){
+    codeEl.addEventListener("keydown", e=>{
+      if(e.key === "Tab"){
+        e.preventDefault();
+        const start = codeEl.selectionStart, end = codeEl.selectionEnd;
+        codeEl.value = codeEl.value.slice(0,start) + "  " + codeEl.value.slice(end);
+        codeEl.selectionStart = codeEl.selectionEnd = start + 2;
+      }
+    });
+  }
+  const runBtn = document.getElementById("btnRun");
+  if(runBtn) runBtn.addEventListener("click", handleRun);
+  if(c.runResults) renderRunResults();
+
+  if(s.phase === "answering"){
+    document.querySelectorAll("[data-conf]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        c.pendingConfidence = parseInt(btn.getAttribute("data-conf"),10);
+        document.querySelectorAll("[data-conf]").forEach(b=>b.classList.toggle("sel", b===btn));
+        document.getElementById("btnSubmitAns").disabled = false;
+      });
+    });
+    document.getElementById("btnSubmitAns").addEventListener("click", ()=>submitAnswer(false));
+  } else {
+    const nb = document.getElementById("btnNext");
+    if(nb) nb.addEventListener("click", nextQuestion);
+  }
+}
+
+function renderFeed(){
+  const el = document.getElementById("panelFeed");
+  if(!el) return;
+  const s = state.session, c = s.current;
+  const feedHtml = (c.interviewerFeed||[]).map(m=>{
+    if(m.isVerdict){
+      return '<div class="msg"><div class="who">Interviewer</div>'+
+        (typeof m.score === "number" ? '<div class="score '+esc(m.verdict)+'">'+m.score+'</div>' : '')+
+        '<div class="verdict-lbl" style="margin-bottom:6px;">'+esc(m.verdict||"")+'</div>'+
+        (m.feedback ? '<div>'+esc(m.feedback)+'</div>' : '')+
+        (m.missed && m.missed.length ? '<ul>'+m.missed.map(x=>'<li>'+esc(x)+'</li>').join("")+'</ul>' : '')+
+        (m.complexity ? '<div style="margin-top:6px;color:var(--muted);">'+esc(m.complexity)+'</div>' : '')+
+        (m.followup ? '<div style="margin-top:8px;border-left:2px solid var(--accent);padding-left:8px;">'+esc(m.followup)+'</div>' : '')+
+      '</div>';
+    }
+    return '<div class="msg'+(m.who==="you"?" you":"")+'"><div class="who">'+(m.who==="you"?"You":"Interviewer")+'</div>'+esc(m.text)+'</div>';
+  }).join("");
+  el.innerHTML =
+    '<h3>Interviewer</h3>'+
+    '<div class="feed" id="feedScroll">'+feedHtml+'</div>'+
+    (s.phase === "answering" ? '<div class="ask-row"><input type="text" id="askInput" class="txt" placeholder="Ask a clarifying question…"><button class="btn ghost sm" id="btnAsk">Ask</button></div>' : '');
+  const askBtn = document.getElementById("btnAsk");
+  if(askBtn) askBtn.addEventListener("click", askClarifying);
+  const askInput = document.getElementById("askInput");
+  if(askInput) askInput.addEventListener("keydown", e=>{ if(e.key === "Enter") askClarifying(); });
+  const scrollBox = document.getElementById("feedScroll");
+  if(scrollBox) scrollBox.scrollTop = scrollBox.scrollHeight;
+}
+
+function renderSummary(view, s){
+  const sum = s.summary || {};
+  view.innerHTML =
+    '<div class="view-head"><h1>Session summary</h1><p>'+ (s.topic ? esc(s.topic)+" · " : "Cumulative · ") + esc(tierInfo(s.tier).label) + '</p></div>'+
+    '<div class="card">'+
+      '<div class="big-score"><span class="n">'+(sum.overall_score ?? "–")+'</span><span style="color:var(--muted);font-size:13px;">overall score</span></div>'+
+      (sum.topic_breakdown && sum.topic_breakdown.length ? '<div style="margin-top:18px;">'+sum.topic_breakdown.map(t=>
+        '<div class="topic-bar-row"><span class="name">'+esc(t.topic)+'</span><div class="topic-bar-track"><div class="topic-bar-fill" style="width:'+Math.max(4,t.avg_score)+'%;"></div></div><span class="topic-bar-val">'+t.avg_score+'</span></div>'
+      ).join("")+'</div>' : '')+
+    '</div>'+
+    (sum.strengths && sum.strengths.length ? '<div class="card"><h4 style="margin:0 0 8px;font-size:13px;color:var(--muted);">Strengths</h4><ul style="margin:0;padding-left:18px;font-size:14px;">'+sum.strengths.map(x=>'<li>'+esc(x)+'</li>').join("")+'</ul></div>' : '')+
+    (sum.weak_areas && sum.weak_areas.length ? '<div class="card"><h4 style="margin:0 0 8px;font-size:13px;color:var(--muted);">Weak areas</h4><ul style="margin:0;padding-left:18px;font-size:14px;">'+sum.weak_areas.map(x=>'<li>'+esc(x)+'</li>').join("")+'</ul></div>' : '')+
+    (sum.suggestions && sum.suggestions.length ? '<div class="card"><h4 style="margin:0 0 8px;font-size:13px;color:var(--muted);">Suggestions</h4><ul style="margin:0;padding-left:18px;font-size:14px;">'+sum.suggestions.map(x=>'<li>'+esc(x)+'</li>').join("")+'</ul></div>' : '')+
+    (sum.confidence_calibration_note ? '<div class="card"><h4 style="margin:0 0 8px;font-size:13px;color:var(--muted);">Confidence calibration</h4><p style="margin:0;font-size:14px;">'+esc(sum.confidence_calibration_note)+'</p></div>' : '')+
+    '<div class="row" style="margin-top:16px;"><button class="btn" id="btnDone">Back to setup</button><button class="btn ghost" id="btnHist">View history</button></div>';
+  document.getElementById("btnDone").addEventListener("click", endSessionToSetup);
+  document.getElementById("btnHist").addEventListener("click", ()=>{ state.session = null; state.view = "history"; render(); });
+}
+
+/* ---- History view ---- */
+function renderHistory(view){
+  view.innerHTML = '<div class="view-head"><h1>History</h1><p>Past sessions and how your topics are trending.</p></div>';
+
+  const topics = Object.keys(state.topicStats);
+  if(topics.length){
+    const trendCard = document.createElement("div");
+    trendCard.className = "card";
+    trendCard.innerHTML = '<h4 style="margin:0 0 12px;font-size:13px;color:var(--muted);">Topic averages</h4>';
+    topics.sort((a,b)=>state.topicStats[a].avgScore - state.topicStats[b].avgScore).forEach(topic=>{
+      const st = state.topicStats[topic];
+      const row = document.createElement("div");
+      row.className = "topic-bar-row";
+      row.innerHTML = '<span class="name">'+esc(topic)+'</span><div class="topic-bar-track"><div class="topic-bar-fill" style="width:'+Math.max(4,Math.round(st.avgScore))+'%;"></div></div><span class="topic-bar-val">'+Math.round(st.avgScore)+'</span>';
+      trendCard.appendChild(row);
+    });
+    view.appendChild(trendCard);
+  }
+
+  const listCard = document.createElement("div");
+  listCard.className = "card";
+  if(state.sessions.length === 0){
+    listCard.innerHTML = '<div class="empty">No sessions yet. Run one from Setup.</div>';
+  } else {
+    listCard.innerHTML = "";
+    state.sessions.forEach(sess=>{
+      const row = document.createElement("div");
+      row.className = "hist-row";
+      const date = new Date(sess.endedAt).toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"});
+      const label = sess.topic ? sess.topic : "Cumulative";
+      row.innerHTML =
+        '<div class="hist-row-top"><span class="l">'+esc(label)+' · '+esc(tierInfo(sess.tier).label)+'</span><span class="r">'+(sess.summary && sess.summary.overall_score!=null ? sess.summary.overall_score : "–")+'</span></div>'+
+        '<div class="hist-meta">'+date+' · '+sess.questions.length+' question'+(sess.questions.length===1?"":"s")+'</div>'+
+        '<div class="hist-detail" id="hd-'+sess.id+'"></div>';
+      row.addEventListener("click", ()=>{
+        state.historyOpen[sess.id] = !state.historyOpen[sess.id];
+        const d = row.querySelector(".hist-detail");
+        d.classList.toggle("open", state.historyOpen[sess.id]);
+        if(state.historyOpen[sess.id] && !d.dataset.filled){
+          d.dataset.filled = "1";
+          d.innerHTML = sess.questions.map(q=>
+            '<div class="hist-q"><span class="qt">'+esc((q.topic||"")+" — "+(q.title||""))+'</span><span>'+(q.correctness_score ?? "–")+'</span></div>'
+          ).join("");
+        }
+      });
+      listCard.appendChild(row);
+    });
+  }
+  view.appendChild(listCard);
+}
+
+/* ============ init ============ */
+async function init(){
+  const [bankDoc, sessDoc, statsDoc] = await Promise.all([
+    docGet(PATH_BANK, { questions: [] }),
+    docGet(PATH_SESSIONS, { list: [] }),
+    docGet(PATH_STATS, {})
+  ]);
+  state.bank = bankDoc.questions || [];
+  state.sessions = sessDoc.list || [];
+  state.topicStats = statsDoc || {};
+  render();
+}
+init();
+
+})();
+</script>
+</body>
+</html>

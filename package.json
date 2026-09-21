@@ -1,0 +1,9 @@
+{
+  "name": "the-room-dsa-interview-agent",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Self-hosted DSA mock interview agent — static frontend + a small serverless proxy to the Anthropic API.",
+  "engines": {
+    "node": ">=18"
+  }
+}
