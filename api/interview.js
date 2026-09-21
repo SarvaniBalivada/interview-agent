@@ -1,28 +1,44 @@
-// Vercel serverless function.
-// Keeps your Anthropic API key server-side — the browser never sees it.
-// Deploy: set ANTHROPIC_API_KEY in your Vercel project's Environment Variables.
-
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     res.status(405).json({ error: "Method not allowed" });
     return;
   }
 
+  console.log("request body type:", typeof req.body, "has json:", typeof req.json, "has text:", typeof req.text, "body keys:", req.body ? Object.keys(req.body) : "none");
+
   let reqBody;
-  try {
-    if (req.json && typeof req.json === "function") {
-      reqBody = await req.json();
-    } else {
-      reqBody = req.body || {};
+  if (req.body && typeof req.body === "object" && !Buffer.isBuffer(req.body)) {
+    reqBody = req.body;
+  } else if (typeof req.text === "function") {
+    try {
+      const text = await req.text();
+      console.log("raw body text length:", text.length, "text preview:", text.slice(0, 100));
+      reqBody = JSON.parse(text);
+    } catch (e) {
+      console.log("text parse error:", e.message);
+      reqBody = {};
     }
-  } catch (e) {
+  } else if (typeof req.json === "function") {
+    try {
+      reqBody = await req.json();
+      console.log("json body keys:", Object.keys(reqBody));
+    } catch (e) {
+      console.log("json parse error:", e.message);
+      reqBody = {};
+    }
+  } else if (typeof req.body === "string") {
+    try {
+      reqBody = JSON.parse(req.body);
+    } catch (e) {
+      reqBody = {};
+    }
+  } else {
     reqBody = {};
   }
-  if (typeof reqBody === "string") {
-    try { reqBody = JSON.parse(reqBody); } catch (e) { reqBody = {}; }
-  }
+
   const { prompt } = reqBody || {};
   if (typeof prompt !== "string") {
+    console.log("prompt missing, reqBody:", JSON.stringify(reqBody).slice(0, 200));
     res.status(400).json({ error: "Missing 'prompt' in request body" });
     return;
   }
